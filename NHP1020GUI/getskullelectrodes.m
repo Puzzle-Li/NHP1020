@@ -20,19 +20,22 @@ function skullelectrodes = getskullelectrodes(inskullelectrodes, inskullsurface,
         dstP     = sqrt(sum( tmpP .* tmpP, 1 ));
         circlInd = find(dstP<5);
         x        = fitNormal( castPatchFull.vertices(circlInd,:));
-        x = x * sign(x(3));
-        if pos(2) > 15
-           x = x * sign(x(2)); 
-        end
 
-        if pos(2) < -15
-           x = x * -1*sign(x(2)); 
-        end
-
-        if abs(pos(2))<2  % x 
-           x(2) = 0;
-           x = x/sqrt(sum(x.*x));
-        end
+        % edit by lipzh@shanghaitech.edu.cn on 2023-10-23
+        x = x * sign(x' * pos);
+%         x = x * sign(x(3));
+%         if pos(2) > 15
+%            x = x * sign(x(2)); 
+%         end
+% 
+%         if pos(2) < -15
+%            x = x * -1*sign(x(2)); 
+%         end
+% 
+%         if abs(pos(2))<2  % x 
+%            x(2) = 0;
+%            x = x/sqrt(sum(x.*x));
+%         end
         skullelectrodes(i).normal = x;
         
         % find the closet point on skull
@@ -61,19 +64,21 @@ function skullelectrodes = getskullelectrodes(inskullelectrodes, inskullsurface,
         dstP     = sqrt(sum( tmpP .* tmpP, 1 ));
         circlInd = find(dstP<5);
         x        = fitNormal( octPatch.vertices(circlInd,:));
-        x = x * sign(x(3));
-        if pos(2) > 15
-           x = x * sign(x(2)); 
-        end
-
-        if pos(2) < -15
-           x = x * -1*sign(x(2)); 
-        end
-
-        if abs(pos(2))<2  % x 
-           x(2) = 0;
-           x = x/sqrt(sum(x.*x));
-        end
+        % edit by lipzh@shanghaitech.edu.cn on 2023-10-23
+        x = x * sign(x' * pos);
+%         x = x * sign(x(3));
+%         if pos(2) > 15
+%            x = x * sign(x(2)); 
+%         end
+% 
+%         if pos(2) < -15
+%            x = x * -1*sign(x(2)); 
+%         end
+% 
+%         if abs(pos(2))<2  % x 
+%            x(2) = 0;
+%            x = x/sqrt(sum(x.*x));
+%         end
         skullelectrodes(i).normalSkull = x;
 
      end

@@ -171,11 +171,20 @@ classdef InskullElectrode
                 N   = N/sqrt(sum(N.*N)); 
 
                 cutTmp = intersectPlaneSurf(InskullSurface.castPatchFull, I2Nposition, N);
-                sliceCut = cutTmp{1};
+                
+                % edited by lipzh@shanghaitech.edu.cn on 2023-10-24
+%                 sliceCut = cutTmp{1};
+                [~, ind] = max(cellfun(@length, cutTmp));
+                sliceCut = cutTmp{ind};
 
                 % az
                 % slice's top point which is on midline
-                topInd = find(sliceCut(2,:)==0 & sliceCut(3,:)>0.7*max(sliceCut(3,:)) );
+
+                % edited by lipzh@shanghaitech.edu.cn on 2023-10-24
+%                 topInd = find(sliceCut(2,:)==0 & sliceCut(3,:)>0.7*max(sliceCut(3,:)) );
+                midInd = find(sliceCut(2,:)==0);
+                [~, topInd] = max(sliceCut(3,midInd));
+                topInd = midInd(topInd);
 
                 slcL = [sliceCut(:,topInd:end),sliceCut(:,1:topInd)];
                 if slcL(2,5) < 0 

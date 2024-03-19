@@ -329,9 +329,9 @@ if isfile([handles.datapath handles.separator handles.animal '_castPatchFull.stl
     handles.castPatchFull = stlread([handles.datapath handles.separator handles.animal '_castPatchFull.stl']);
     handles.castPatch = reducepatch(handles.castPatchFull,0.1);
     
-    if isfile([handles.datapath handles.separator handles.animal '_ctPatchFull.stl'])
-        handles.ctPatchFull = stlread([handles.datapath handles.separator handles.animal '_ctPatchFull.stl']);
-        handles.ctPatch = reducepatch(handles.ctPatchFull,0.2);
+%     if isfile([handles.datapath handles.separator handles.animal '_ctPatchFull.stl'])
+%         handles.ctPatchFull = stlread([handles.datapath handles.separator handles.animal '_ctPatchFull.stl']);
+%         handles.ctPatch = reducepatch(handles.ctPatchFull,0.2);
         
         if isfile([handles.datapath handles.separator handles.animal '_octPatch.stl'])
             handles.octPatch = stlread([handles.datapath handles.separator handles.animal '_octPatch.stl']);
@@ -367,11 +367,11 @@ if isfile([handles.datapath handles.separator handles.animal '_castPatchFull.stl
             view([0, -1, 0])
             handles.skullThick = str2double(get(handles.editSkullThickness, 'String'));
         end
-    end
+%     end
 else
     
     
-    if 1==0
+%     if 1==0
         % If stl file does not exit, calculate it
         % Save skull thickness
         handles.skullThick = str2double(get(handles.editSkullThickness, 'String'));
@@ -381,7 +381,9 @@ else
         %     cast = load_nii( [handles.datapath handles.separator handles.animal, '_inskull_mask_filt.nii.gz'] );
         ct   = load_nii( [handles.datapath handles.separator '*CT_skull*.nii.gz']  );
         cast = load_nii( [handles.datapath handles.separator '*inskull*.nii.gz'] );
-        xgv = ((0:(cast.hdr.dime.dim(2))-1)*cast.hdr.dime.pixdim(2)) -cast.hdr.hist.qoffset_x ;
+        % edited by lipzh@shanghaitech.edu.cn on 2023-10-24
+%         xgv = ((0:(cast.hdr.dime.dim(2))-1)*cast.hdr.dime.pixdim(2)) -cast.hdr.hist.qoffset_x ;
+        xgv = ((0:(cast.hdr.dime.dim(2))-1)*cast.hdr.dime.pixdim(2)) +cast.hdr.hist.qoffset_x ;
         ygv = ((0:(cast.hdr.dime.dim(3))-1)*cast.hdr.dime.pixdim(3)) +cast.hdr.hist.qoffset_y ;
         zgv = ((0:(cast.hdr.dime.dim(4))-1)*cast.hdr.dime.pixdim(4)) +cast.hdr.hist.qoffset_z ;
         [X,Y,Z] = meshgrid(ygv,xgv,zgv);
@@ -391,50 +393,55 @@ else
         castPatch     = reducepatch(castPatchFull,0.1);
         stlwrite([handles.datapath handles.separator handles.animal '_castPatchFull.stl'], castPatchFull);
         stlwrite([handles.datapath handles.separator handles.animal '_castPatch.stl'], castPatch);
-        % skull
-        zeroInd = max(find(zgv<2.0));
-        ct.img(:,:,1:zeroInd) = 0;
-        ct.img(find(cast.img>0.5)) = 0; % prevent overlapp of the two volumes
-        ctPatchFull = isosurface(X,Y,Z,squeeze(ct.img),500);
-        ctPatch     = reducepatch(ctPatchFull,0.2);
-        
-        stlwrite([handles.datapath handles.separator handles.animal '_ctPatchFull.stl'], ctPatchFull);
-        stlwrite([handles.datapath handles.separator handles.animal '_ctPatch.stl'], ctPatch);
-        
-        % calculate the closest distance for all vertices of the ct to the cast.
-        % vertices that are very close to the cast, most likely correspond to the
-        % inside skull surface. Remove those vertices and corresponding faces
-        minDist = zeros( size(ctPatch.vertices,1),2 );
-        for i = 1:length(ctPatch.vertices)
-            iMat  = [ ctPatch.vertices(i,1)*ones(size(castPatchFull.vertices,1),1),...
-                ctPatch.vertices(i,2)*ones(size(castPatchFull.vertices,1),1),...
-                ctPatch.vertices(i,3)*ones(size(castPatchFull.vertices,1),1)]';
-            tmp = castPatchFull.vertices' - iMat;
-            dst = sqrt(sum( tmp .* tmp, 1 ));
-            minDist(i,1) = min(dst);
-            disc         = find(dst==min(dst));
-            minDist(i,2) = disc(1);
-        end
-        
-        % Load skullThick from input
-        skullThick = handles.skullThick;
-        
-        % Calculate octPatch
-        valInd            = find( minDist(:,1)>skullThick );
-        invInd            = zeros(length(ctPatch.vertices),1 );
-        invInd(valInd)    = 1:length(valInd);
-        octPatch.vertices = ctPatch.vertices(valInd,:);
-        valPatch          = zeros(length(ctPatchFull.faces),1);
-        for i = 1:length(ctPatch.faces)
-            if ismember( ctPatch.faces(i,1), valInd ) && ismember( ctPatch.faces(i,2), valInd ) && ismember( ctPatch.faces(i,3), valInd )
-                valPatch(i) = 1;
-                %pi = pi + 1;
-                %octPatch.faces(pi) = invInd(ctPatch.faces(i,:));
-                
-            end
-        end
-        octPatch.faces = invInd(ctPatch.faces(find(valPatch),:));
-        stlwrite([handles.datapath handles.separator handles.animal '_octPatch.stl'], octPatch);
+%         % skull
+%         % edited by lipzh@shanghaitech.edu.cn on 2023-10-24
+%         % zeroInd = max(find(zgv<2.0));
+%         hthr = prctile(zgv, 25);
+%         zeroInd = max(find(zgv<hthr));
+%         ct.img(:,:,1:zeroInd) = 0;
+%         ct.img(find(cast.img>0.5)) = 0; % prevent overlapp of the two volumes
+%         ctPatchFull = isosurface(X,Y,Z,squeeze(ct.img),500);
+%         ctPatch     = reducepatch(ctPatchFull,0.2);
+%         
+%         stlwrite([handles.datapath handles.separator handles.animal '_ctPatchFull.stl'], ctPatchFull);
+%         stlwrite([handles.datapath handles.separator handles.animal '_ctPatch.stl'], ctPatch);
+%         
+%         % calculate the closest distance for all vertices of the ct to the cast.
+%         % vertices that are very close to the cast, most likely correspond to the
+%         % inside skull surface. Remove those vertices and corresponding faces
+%         minDist = zeros( size(ctPatch.vertices,1),2 );
+%         for i = 1:length(ctPatch.vertices)
+%             iMat  = [ ctPatch.vertices(i,1)*ones(size(castPatchFull.vertices,1),1),...
+%                 ctPatch.vertices(i,2)*ones(size(castPatchFull.vertices,1),1),...
+%                 ctPatch.vertices(i,3)*ones(size(castPatchFull.vertices,1),1)]';
+%             tmp = castPatchFull.vertices' - iMat;
+%             dst = sqrt(sum( tmp .* tmp, 1 ));
+%             minDist(i,1) = min(dst);
+%             disc         = find(dst==min(dst));
+%             minDist(i,2) = disc(1);
+%         end
+%         
+%         % Load skullThick from input
+%         skullThick = handles.skullThick;
+%         
+%         % Calculate octPatch
+%         valInd            = find( minDist(:,1)>skullThick );
+%         invInd            = zeros(length(ctPatch.vertices),1 );
+%         invInd(valInd)    = 1:length(valInd);
+%         octPatch.vertices = ctPatch.vertices(valInd,:);
+%         valPatch          = zeros(length(ctPatchFull.faces),1);
+%         for i = 1:length(ctPatch.faces)
+%             if ismember( ctPatch.faces(i,1), valInd ) && ismember( ctPatch.faces(i,2), valInd ) && ismember( ctPatch.faces(i,3), valInd )
+%                 valPatch(i) = 1;
+%                 %pi = pi + 1;
+%                 %octPatch.faces(pi) = invInd(ctPatch.faces(i,:));
+%                 
+%             end
+%         end
+%         octPatch.faces = invInd(ctPatch.faces(find(valPatch),:));
+%         stlwrite([handles.datapath handles.separator handles.animal '_octPatch.stl'], octPatch);
+
+        handles.octPatch = stlread([handles.datapath handles.separator handles.animal '_octPatch.stl']);
         
         % Top View
         cla(handles.axesTopView)
@@ -472,7 +479,7 @@ else
         handles.castPatchFull = castPatchFull;
         handles.castPatch = castPatch;
         handles.octPatch = octPatch;
-    end
+%     end
 end
 
 % Close progress bar
@@ -512,7 +519,7 @@ handles.skullThresh = str2double(get(handles.editSkullThreshold, 'String'));
 % Load images
 ct   = load_nii( [handles.datapath handles.separator '*CT_skull*.nii.gz']  );
 cast = load_nii( [handles.datapath handles.separator '*inskull*.nii.gz'] );
-xgv = ((0:(cast.hdr.dime.dim(2))-1)*cast.hdr.dime.pixdim(2)) -cast.hdr.hist.qoffset_x ;
+xgv = ((0:(cast.hdr.dime.dim(2))-1)*cast.hdr.dime.pixdim(2)) +cast.hdr.hist.qoffset_x ;
 ygv = ((0:(cast.hdr.dime.dim(3))-1)*cast.hdr.dime.pixdim(3)) +cast.hdr.hist.qoffset_y ;
 zgv = ((0:(cast.hdr.dime.dim(4))-1)*cast.hdr.dime.pixdim(4)) +cast.hdr.hist.qoffset_z ;
 [X,Y,Z] = meshgrid(ygv,xgv,zgv);
@@ -523,7 +530,10 @@ castPatch     = reducepatch(castPatchFull,0.1);
 stlwrite([handles.datapath handles.separator handles.animal '_castPatchFull.stl'], castPatchFull);
 stlwrite([handles.datapath handles.separator handles.animal '_castPatch.stl'], castPatch);
 % skull
-zeroInd = max(find(zgv<2.0));
+% edited by lipzh@shanghaitech.edu.cn on 2023-10-24
+% zeroInd = max(find(zgv<2.0));
+hthr = prctile(zgv, 35);
+zeroInd = max(find(zgv<hthr));
 ct.img(:,:,1:zeroInd) = 0;
 ct.img(find(cast.img>0.5)) = 0; % prevent overlapp of the two volumes
 ctPatchFull = isosurface(X,Y,Z,squeeze(ct.img),handles.skullThresh); 
