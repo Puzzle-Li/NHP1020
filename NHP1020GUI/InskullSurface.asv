@@ -87,7 +87,7 @@ classdef InskullSurface
             
             N2NCut_APart = N2NCut(:, N2NCut(1,:)>0);
             [~ , Fp_index_on_N2N_in_APart] = min(abs(N2NCut_APart(2, :)));
-            [~, Fp_index_on_N2N] = min(vecnorm(N2NCut - N2NCut_APart(:,Fp_index_on_N2N_in_APart)));
+            [~, Fp_index_on_N2N] = vecnorm(N2NCut - N2NCut_Apart(:,Fp_index_on_N2N_in_A_part))
 %             Fp_index_on_N2N    = find( & N2NCut(1,:)>0 );
             
             tmp_data = [N2NCut(:,Fp_index_on_N2N :end), N2NCut(:,1:Fp_index_on_N2N )];

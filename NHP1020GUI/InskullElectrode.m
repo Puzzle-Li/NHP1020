@@ -182,7 +182,8 @@ classdef InskullElectrode
 
                 % edited by lipzh@shanghaitech.edu.cn on 2023-10-24
 %                 topInd = find(sliceCut(2,:)==0 & sliceCut(3,:)>0.7*max(sliceCut(3,:)) );
-                midInd = find(sliceCut(2,:)==0);
+%                 midInd = find(sliceCut(2,:)==0);
+                [~, midInd] = min(abs(sliceCut(2,:)));
                 [~, topInd] = max(sliceCut(3,midInd));
                 topInd = midInd(topInd);
 

@@ -326,7 +326,7 @@ set(handles.uipanelSpecifyFolder, 'Title', selpath(idcs(end-1)+1:end));
 
 
 if ~isfile([handles.datapath handles.separator handles.animal '_octPatch.stl'])
-    error(['Please make skull surface file and name it as ' handles.animal '_octPatch.stl" in work directory. '])
+    error('Please make skull surface file and name it as ' handles.animal '_octPatch.stl" in work directory. ')
 else
     
     % skull
@@ -338,9 +338,6 @@ else
         % If stl file exits, show directly
         handles.castPatchFull = stlread([handles.datapath handles.separator handles.animal '_castPatchFull.stl']);
         handles.castPatch = reducepatch(handles.castPatchFull,0.1);
-        castPatchFull = handles.castPatchFull;
-        castPatch = handles.castPatch;
-
     else
 
         % If stl file does not exit, calculate it
@@ -363,44 +360,43 @@ else
         stlwrite([handles.datapath handles.separator handles.animal '_castPatchFull.stl'], castPatchFull);
         stlwrite([handles.datapath handles.separator handles.animal '_castPatch.stl'], castPatch);
 
+        % Top View
+        cla(handles.axesTopView)
+        axes(handles.axesTopView);
+        hold off
+        p = patch(handles.axesTopView, castPatch);
+        set(p, 'FaceColor', handles.bordercolor, 'EdgeColor', 'none');
+        daspect([1 1 1])
+        light('Position', [1 0 0], 'Style', 'infinite' )
+        camlight; lighting phong
+        hold on
+        p = patch(handles.axesTopView, octPatch);
+        set(p, 'FaceColor', [0.5 0.5 1], 'EdgeColor', 'none');
+        alpha(0.5)
+        view([0, 0, 1])
+        camroll(90)
+        
+        % Display Section
+        cla(handles.axesSkullandBrain)
+        axes(handles.axesSkullandBrain);
+        hold off
+        p = patch(handles.axesSkullandBrain, castPatch);
+        set(p, 'FaceColor', handles.bordercolor, 'EdgeColor', 'none');
+        daspect([1 1 1])
+        view(2)
+        light('Position', [1 0 0], 'Style', 'infinite' )
+        camlight; lighting phong
+        hold on
+        p = patch(handles.axesSkullandBrain, octPatch);
+        set(p, 'FaceColor', [0.5 0.5 1], 'EdgeColor', 'none');
+        alpha(0.5)
+        view([0, -1, 0])
+        
+        % Save to handles
+        handles.castPatchFull = castPatchFull;
+        handles.castPatch = castPatch;
+        handles.octPatch = octPatch;
     end
-    % Top View
-    cla(handles.axesTopView)
-    axes(handles.axesTopView);
-    hold off
-    p = patch(handles.axesTopView, castPatch);
-    set(p, 'FaceColor', handles.bordercolor, 'EdgeColor', 'none');
-    daspect([1 1 1])
-    light('Position', [1 0 0], 'Style', 'infinite' )
-    camlight; lighting phong
-    hold on
-    p = patch(handles.axesTopView, octPatch);
-    set(p, 'FaceColor', [0.5 0.5 1], 'EdgeColor', 'none');
-    alpha(0.5)
-    view([0, 0, 1])
-    camroll(90)
-    
-    % Display Section
-    cla(handles.axesSkullandBrain)
-    axes(handles.axesSkullandBrain);
-    hold off
-    p = patch(handles.axesSkullandBrain, castPatch);
-    set(p, 'FaceColor', handles.bordercolor, 'EdgeColor', 'none');
-    daspect([1 1 1])
-    view(2)
-    light('Position', [1 0 0], 'Style', 'infinite' )
-    camlight; lighting phong
-    hold on
-    p = patch(handles.axesSkullandBrain, octPatch);
-    set(p, 'FaceColor', [0.5 0.5 1], 'EdgeColor', 'none');
-    alpha(0.5)
-    view([0, -1, 0])
-    
-    % Save to handles
-    handles.castPatchFull = castPatchFull;
-    handles.castPatch = castPatch;
-    handles.octPatch = octPatch;
-    
 end
 
 
